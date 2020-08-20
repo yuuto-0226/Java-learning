@@ -1,42 +1,77 @@
-package AI00;
 import java.util.Scanner;
 public class perceptronTest {
-	private double e;//»Ö­È
-	private double w;//Åv³N
-	private double[] rate;//¥¿½T²v(%)
-	private int count;//¦¸¼Æ
-	private double Eta=0.005;//¾Ç²ß³t²v
-	private int x;//¿é¤J­È
+	private static double e;//é–¥å€¼
+	private static double w;//æ¬Šè¡“
+	private static float[] rate;//æ­£ç¢ºç‡(%)
+	private static int count;//æ¬¡æ•¸
+	private static double Eta=0.005;//å­¸ç¿’é€Ÿç‡
+	private int x;//è¼¸å…¥å€¼
 	
-	public void set(double[] rate,int count) {
+	public perceptronTest(float rate,int count) {
 		this.e=0;
 		this.w=0;
+		this.x=0;
 		this.count=count;
-		this.rate rate=new double[count];
+		this.rate=new float[count];
 	}
-	
+	//å­¸ç¿’ï¼Œsamples[][0] è¼¸å…¥,samples[][1] è¼¸å‡º
+	public static void fit(int[][] samples) {
+		for(int i=0;i<count;i++) {
+			int erroCount=0;
+			for(int[] sample:samples) {
+				double update=Eta*(sample[1]-sample[0]);
+				
+				w+=update*sample[0];
+				e+=update;
+			}
+			rate[i]=1-erroCount*1.0f/samples.length;
+		}
+	}
+	//sigMoidå‡½æ•¸
 	public static double sigMoid(double net) {
         //Math.E=e;Math.Pow(a,b)=a^b
         double a=Math.pow(Math.E,-net);
         double result=1/(1+a);
         return result;
     }
-	//­×¥¿Åv­È
-	public double bias(int x,double net) {
-		double update;
-		return update=Eta*(fuc(net)-(double)x);
-	}
-	//¨D©M¨ç¼Æ¡A¿é¥X­È§Y¬°net
-	public double net(int x) {
+	//æ±‚å’Œå‡½æ•¸ï¼Œè¼¸å‡ºå€¼å³ç‚ºnet
+	public static double net(int x) {
 		return x*w-e;
 	}
-	//¿Eµo¨ç¼Æ¡A¿é¥X­È§Y¬°Y
-	public double fuc(double net) {
-		return sigMoid(net);
+	//æ¿€ç™¼å‡½æ•¸ï¼Œè¼¸å‡ºå€¼å³ç‚ºY
+	public static double fuc(int x) {
+		return net(x)>=0?0:1;
 	}
-	
-	
-	public static void main(String[] args) {
+	//ä¿®æ­£æ¬Šå€¼
+	public double bias(int x,double net) {
+		double update;
+		return update=Eta*(fuc(x)-(double)x);
+	}
+	//å°å‡ºä¿®æ­£
+	public static void printRate() {
+		for(int i=0;i<count;i++)
+			System.out.print("[#"+i+"]"+rate[i]+"\n");
+	}
 		
+	//å­¸ç¿’æ¨£æœ¬
+	public static int[][] getStudyData(){
+		int[][] data=new int[2000000][2];
+		for(int i=-100000,j=100000;i<100000;i++,j++) {
+			data[j][0]=i;
+			data[j][1]=(i>=0)?1:0;//-10000~10000é–“>0è¼¸å‡º1åä¹‹è¼¸å‡º0
+		}
+		return data;
+	}
+	public static void main(String[] args) {
+		Scanner sc=new Scanner(System.in);
+		perceptronTest perceptron=new perceptronTest(0.0000005f,100);
+		perceptronTest.fit(getStudyData());
+		perceptronTest.printRate();
+		while(true) {
+		System.out.print("[#]  ");
+		int x=sc.nextInt();
+		
+		System.out.println("[#]"+perceptronTest.fuc(x));
+		}
 	}
 }
